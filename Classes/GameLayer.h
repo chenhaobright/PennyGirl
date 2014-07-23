@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 
+#include <string>
+
 #include "RussionRoulette.h"
 
 USING_NS_CC;
@@ -16,6 +18,10 @@ public:
 	virtual bool init();
 	CREATE_FUNC(GameLayer);
 
+private:
+	bool loadResource();
+	int randomMToN(int m, int n);
+	std::string getRandomGirlName();
 private:
 	RussionRoulette _rr;
 };
