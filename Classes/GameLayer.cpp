@@ -1,6 +1,6 @@
 #include "GameLayer.h"
 
-
+#include "Define.h"
 
 GameLayer::GameLayer()
 {
@@ -39,13 +39,53 @@ bool GameLayer::loadResource()
 		if (pSprite == NULL) return false;
 
 		pSprite->setPosition(Point(winSize.width / 2, winSize.height / 2));
-
 		this->addChild(pSprite);
+
+		auto touchListener = EventListenerTouchOneByOne::create();
+		touchListener->onTouchBegan = CC_CALLBACK_2(GameLayer::onTouchBegan, this);
+		_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
 		bRet = true;
 	} while (0);
 
 	return bRet;
+}
+
+bool GameLayer::onTouchBegan(Touch *touch, Event *unused_event)
+{
+	Size winSize = Director::getInstance()->getWinSize();
+
+	Point pt = touch->getLocationInView();
+
+	if (pt.x < winSize.width / 2)
+	{
+		this->shotLogic();
+	}
+	else
+	{
+		this->rollLogic();
+	}
+	
+	return true;
+}
+
+void GameLayer::shotLogic()
+{
+	_rr.shot();
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(SHOT_EMPTY_MP3);
+
+	if (_rr.getIsDead())
+	{
+
+	}
+	else
+	{
+	}
+}
+
+void GameLayer::rollLogic()
+{
+	_rr.roll();
 }
 
 std::string GameLayer::getRandomGirlName()

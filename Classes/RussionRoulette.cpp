@@ -22,8 +22,8 @@ void RussionRoulette::init()
 
 	_shotIndex = rand() % MAX_BULLET_COUNT + 1;
 
-	_sumMoney = 0;
-	_nextShotMoney = 10;
+	_totalMoney = 0;
+	_nextMoney = 10;
 
 	_bDead = false;
 }
@@ -33,7 +33,7 @@ void RussionRoulette::reset()
 	this->init();
 }
 
-//开机
+//开枪
 void RussionRoulette::shot()
 {
 	_shotSum++;
@@ -42,12 +42,18 @@ void RussionRoulette::shot()
 	{
 		this->dead();
 	}
+	else
+	{
+		_totalMoney += _nextMoney;
+		_nextMoney = _shotSum * _shotSum * 10;
+	}
 }
 
 //上膛
 void RussionRoulette::roll()
 {
 	_rollCount++;
+
 }
 
 //爆头
@@ -66,10 +72,4 @@ void RussionRoulette::tryAgain()
 void RussionRoulette::end()
 {
 
-}
-
-//计算下枪金钱
-int RussionRoulette::getNextShotMoney()
-{
-	return 0;
 }

@@ -16,6 +16,10 @@ public:
 	virtual bool init();
 	CREATE_FUNC(PennyScene);
 
+private:
+	bool preloadSound();
+	bool preloadRes();
+
 public:
 	CC_SYNTHESIZE(GameLayer*, _gameLayer, GameLayer);
 	CC_SYNTHESIZE(StartLayer*, _startLayer, StartLayer);

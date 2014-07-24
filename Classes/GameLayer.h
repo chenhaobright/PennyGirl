@@ -18,6 +18,12 @@ public:
 	virtual bool init();
 	CREATE_FUNC(GameLayer);
 
+	virtual bool onTouchBegan(Touch *touch, Event *unused_event) override;
+
+public:
+	void shotLogic();	//¿ªÇ¹Âß¼­
+	void rollLogic();	//ÉÏÌÅÂß¼­
+
 private:
 	bool loadResource();
 	int getRandom(int start, int end);

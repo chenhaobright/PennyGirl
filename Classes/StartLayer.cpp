@@ -15,16 +15,16 @@ bool StartLayer::init()
 	bool bRet = false;
 	do 
 	{
+		CC_BREAK_IF(!Layer::init());
+
 		auto touchListener = EventListenerTouchOneByOne::create();
 		touchListener->onTouchBegan = CC_CALLBACK_2(StartLayer::onTouchBegan, this);
 		_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-		CC_BREAK_IF(!Layer::init());
-
-		Size visibleSize = Director::getInstance()->getVisibleSize();
+		Size winSize = Director::getInstance()->getVisibleSize();
 
 		auto *startSprite = Sprite::create("girl/preface.jpg");
-		startSprite->setPosition(ccp(visibleSize.width / 2, visibleSize.height / 2));
+		startSprite->setPosition(Point(winSize.width / 2, winSize.height / 2));
 		this->addChild(startSprite);
 
 		bRet = true;

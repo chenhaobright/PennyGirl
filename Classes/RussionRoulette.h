@@ -23,7 +23,13 @@ public:
 	void end();
 
 public:
-	int getNextShotMoney();
+	int getShotSum(){ return _shotSum; }
+	int getRollCount(){ return _rollCount; }
+	int getShotIndex(){ return _shotIndex; }
+	int getCurBulletNum(){ return _curBulletNum; }
+	int getTotalMoney(){ return _totalMoney; }
+	int getNextMoney(){ return _nextMoney; }
+	bool getIsDead(){ return _bDead; }
 
 private:
 	int _shotSum;			//开枪次数
@@ -32,8 +38,8 @@ private:
 	int _curBulletNum;		//当前roll的第N枪
 
 private:
-	int _sumMoney;			//获得总金钱
-	int _nextShotMoney;		//下一枪金钱
+	int _totalMoney;			//获得总金钱
+	int _nextMoney;		//下一枪金钱
 
 	bool _bDead;			//是否死亡
 
