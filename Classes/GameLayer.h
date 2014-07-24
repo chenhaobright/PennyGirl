@@ -20,8 +20,9 @@ public:
 
 private:
 	bool loadResource();
-	int randomMToN(int m, int n);
+	int getRandom(int start, int end);
 	std::string getRandomGirlName();
+
 private:
 	RussionRoulette _rr;
 };

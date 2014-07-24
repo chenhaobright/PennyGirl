@@ -38,7 +38,7 @@ bool GameLayer::loadResource()
 		auto *pSprite = Sprite::create(girlName.c_str());
 		if (pSprite == NULL) return false;
 
-		pSprite->setPosition(ccp(winSize.width / 2, winSize.height / 2));
+		pSprite->setPosition(Point(winSize.width / 2, winSize.height / 2));
 
 		this->addChild(pSprite);
 
@@ -50,7 +50,7 @@ bool GameLayer::loadResource()
 
 std::string GameLayer::getRandomGirlName()
 {
-	int randomIndex = randomMToN(1, 3);
+	int randomIndex = getRandom(1, 3);
 	std::string girlName;
 	if (randomIndex != -1)
 	{
@@ -64,21 +64,12 @@ std::string GameLayer::getRandomGirlName()
 	return girlName;
 }
 
-int GameLayer::randomMToN(int m, int n)
+int GameLayer::getRandom(int start, int end)
 {
-	if (m < 1 || n < 1 || m >= n)
+	if (start < 1 || end < 1 || start >= end)
 	{
 		return -1;
 	}
-	
-	while (1)
-	{
-		int result = CCRANDOM_0_1() * n;
-		if (result <= n && result >= m)
-		{
-			return result;
-		}
-	}
 
-	return -1;
+	return  (end - start + 1) * CCRANDOM_0_1() + start;
 }
