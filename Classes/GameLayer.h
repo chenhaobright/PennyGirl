@@ -10,14 +10,15 @@
 
 USING_NS_CC;
 
-class GameLayer : public Layer
+class GameLayer : public LayerColor
 {
 public:
 	GameLayer();
 	~GameLayer();
 
-	virtual bool init();
-	CREATE_FUNC(GameLayer);
+	static GameLayer* createWithColor(const Color4B& color, GLfloat width, GLfloat height);
+
+	bool initWithColor(const Color4B& color, GLfloat width, GLfloat height);
 
 	virtual bool onTouchBegan(Touch *touch, Event *unused_event) override;
 

@@ -18,12 +18,12 @@ void RussionRoulette::init()
 	_rollCount = 0;
 	_shotSum = 0;
 
-	_curBulletNum = 0;
+	_curBulletNum = 1;
 
 	_shotIndex = rand() % MAX_BULLET_COUNT + 1;
 
 	_totalMoney = 0;
-	_nextMoney = 10;
+	_nextMoney = _curBulletNum * _curBulletNum * 10;
 
 	_bDead = false;
 }
@@ -37,15 +37,16 @@ void RussionRoulette::reset()
 void RussionRoulette::shot()
 {
 	_shotSum++;
-	_curBulletNum++;
+	
 	if (_curBulletNum >= _shotIndex)
 	{
 		this->dead();
 	}
 	else
 	{
+		_curBulletNum++;
 		_totalMoney += _nextMoney;
-		_nextMoney = _shotSum * _shotSum * 10;
+		_nextMoney = _curBulletNum * _curBulletNum * 10;
 	}
 }
 
@@ -53,6 +54,9 @@ void RussionRoulette::shot()
 void RussionRoulette::roll()
 {
 	_rollCount++;
+	_curBulletNum = 1;
+	_shotIndex = rand() % MAX_BULLET_COUNT + 1;
+	_nextMoney = _curBulletNum * _curBulletNum * 10;
 
 }
 

@@ -28,7 +28,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 		glview->setDesignResolutionSize(768, 1024, ResolutionPolicy::FIXED_WIDTH);
     }
 
-    director->setDisplayStats(true);
+    //director->setDisplayStats(true);
     director->setAnimationInterval(1.0 / 60);
 
 	auto scene = PennyScene::create();

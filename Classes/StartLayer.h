@@ -8,15 +8,19 @@ USING_NS_CC;
 class StartLayer : public Layer
 {
 public:
-	static Scene* createScene();
+	StartLayer();
+	~StartLayer();
 
 	virtual bool init();
+	bool loadRes();
+	bool loadUserDefault();
 
 	virtual bool onTouchBegan(Touch *touch, Event *unused_event) override;
 
 	CREATE_FUNC(StartLayer);
 private:
-	
+	Label* _topScoreLabel;
+	Label* _deadNumLabel;
 };
 
 #endif	//__START_SCENE_H__

@@ -17,13 +17,29 @@ GameLayer::~GameLayer()
 {
 }
 
-bool GameLayer::init()
+GameLayer* GameLayer::createWithColor(const Color4B& color, GLfloat width, GLfloat height)
+{
+	GameLayer* pRet = new GameLayer();
+	if (pRet && pRet->initWithColor(color, width, height))
+	{
+		pRet->autorelease();
+	}
+	else
+	{
+		delete pRet;
+		pRet = NULL;
+	}
+
+	return pRet;
+}
+
+bool GameLayer::initWithColor(const Color4B& color, GLfloat width, GLfloat height)
 {
 	bool bRet = false;
 
 	do 
 	{
-		CC_BREAK_IF(!CCLayer::init());
+		CC_BREAK_IF(!LayerColor::initWithColor(color, width, height));
 
 		CC_BREAK_IF(!this->loadResource());
 		CC_BREAK_IF(!this->loadDataLayer());
@@ -87,7 +103,7 @@ bool GameLayer::loadDataLayer()
 	
 	do
 	{
-		_dataLayer = DataLayer::createWithColor(Color4B(10,10,10,255), WINSIZE.width, WINSIZE.height / 10);
+		_dataLayer = DataLayer::createWithColor(Color4B(200, 200, 200, 50), WINSIZE.width, WINSIZE.height / 5);
 		this->addChild(_dataLayer, 100);
 
 		bRet = true;
@@ -98,26 +114,26 @@ bool GameLayer::loadDataLayer()
 
 bool GameLayer::onTouchBegan(Touch *touch, Event *unused_event)
 {
-	Point pt = touch->getLocationInView();
+	Point pt = touch->getLocation();
 
 	if (_rr.getIsDead())		//如果女孩已经死亡
 	{
-		if (pt.x < WINSIZE.width / 2)		//点击屏幕左边重新开始
+		if (pt.y < WINSIZE.height / 2)		
 		{
 			this->restart();
 		}
-		else								//点击屏幕右边结束游戏
+		else						
 		{
 			this->gameover();
 		}
 	}
 	else						//女孩活着
 	{
-		if (pt.x < WINSIZE.width / 2)		//点击屏幕左边开枪
+		if (pt.y < WINSIZE.height / 2)		
 		{
 			this->shotLogic();
 		}
-		else								//点击屏幕右边换子弹
+		else							
 		{
 			this->rollLogic();
 		}
@@ -128,13 +144,38 @@ bool GameLayer::onTouchBegan(Touch *touch, Event *unused_event)
 
 void GameLayer::shotLogic()
 {
-	SimpleAudioEngine::getInstance()->playEffect(SHOT_EMPTY_MP3);
+	SET_DEAD_NUM(GET_DEAD_NUM + 1);
 	
 	_rr.shot();
+
 	if (_rr.getIsDead())
 	{
+		static int i = 0;
+		if (i++ % 2 == 0)
+		{
+			SimpleAudioEngine::getInstance()->playEffect(PISTOL2_MP3);
+		}
+		else
+		{
+			SimpleAudioEngine::getInstance()->playEffect(PISTOL1_MP3);
+		}
+		
 		_girlSpriteAlive->setVisible(false);
 		_girlSpriteDead->setVisible(true);
+	}
+	else
+	{
+		SimpleAudioEngine::getInstance()->playEffect(SHOT_EMPTY_MP3);
+		int totalMoney = _rr.getTotalMoney();
+
+		_dataLayer->setTotalMoney(totalMoney);
+		_dataLayer->setNextMoney(_rr.getNextMoney());
+
+		if (totalMoney > GET_TOP_SCORE)
+		{
+			SET_TOP_SCORE(totalMoney);
+			_dataLayer->setTopScore(totalMoney);
+		}
 	}
 }
 
@@ -142,6 +183,8 @@ void GameLayer::rollLogic()
 {
 	SimpleAudioEngine::getInstance()->playEffect(ROLL_MP3);
 	_rr.roll();
+
+	_dataLayer->setNextMoney(_rr.getNextMoney());
 }
 
 void GameLayer::restart()
@@ -149,6 +192,7 @@ void GameLayer::restart()
 	this->reset();
 
 	this->loadResource();
+	this->loadDataLayer();
 }
 
 void GameLayer::gameover()

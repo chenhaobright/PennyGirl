@@ -56,7 +56,7 @@ void PennyScene::addStartLayer()
 
 void PennyScene::addGameLayer()
 {
-	_gameLayer = GameLayer::create();
+	_gameLayer = GameLayer::createWithColor(Color4B::WHITE, WINSIZE.width, WINSIZE.height);
 	this->addChild(_gameLayer);
 }
 
