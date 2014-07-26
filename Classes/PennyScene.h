@@ -16,6 +16,9 @@ public:
 	virtual bool init();
 	CREATE_FUNC(PennyScene);
 
+	void addStartLayer();
+	void addGameLayer();
+
 private:
 	bool preloadSound();
 	bool preloadRes();

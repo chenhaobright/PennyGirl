@@ -24,12 +24,7 @@ bool PennyScene::init()
 		CC_BREAK_IF(!this->preloadSound());
 		CC_BREAK_IF(!this->preloadRes());
 
-		_startLayer = StartLayer::create();
-		this->addChild(_startLayer, 0);
-
-		_gameLayer = GameLayer::create();
-		_gameLayer->setVisible(false);
-		this->addChild(_gameLayer, 1);
+		this->addStartLayer();
 
 		bRet = true;
 	} while (0);
@@ -51,3 +46,17 @@ bool PennyScene::preloadRes()
 {
 	return true;
 }
+
+
+void PennyScene::addStartLayer()
+{
+	_startLayer = StartLayer::create();
+	this->addChild(_startLayer);
+}
+
+void PennyScene::addGameLayer()
+{
+	_gameLayer = GameLayer::create();
+	this->addChild(_gameLayer);
+}
+

@@ -1,5 +1,6 @@
 #include "StartLayer.h"
 #include "PennyScene.h"
+#include "GameLayer.h"
 
 Scene* StartLayer::createScene()
 {
@@ -35,9 +36,10 @@ bool StartLayer::init()
 
 bool StartLayer::onTouchBegan(Touch *touch, Event *unused_event)
 {
-	PennyScene* runningScene = static_cast<PennyScene*>(Director::getInstance()->getRunningScene());
-	runningScene->getStartLayer()->setVisible(false);
-	runningScene->getGameLayer()->setVisible(true);
+	auto* scene = static_cast<PennyScene*>(Director::getInstance()->getRunningScene());
+	scene->addGameLayer();
+
+	this->removeFromParentAndCleanup(true);
 	
 	return true;
 }

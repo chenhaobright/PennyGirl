@@ -1,15 +1,20 @@
 #include "GameLayer.h"
+#include "PennyScene.h"
 
 #include "Define.h"
 
+using namespace CocosDenshion;
+
 GameLayer::GameLayer()
 {
-
+	_dataLayer = NULL;
+	_girlSpriteAlive = nullptr;
+	_girlSpriteRoll = nullptr;
+	_girlSpriteDead = nullptr;
 }
 
 GameLayer::~GameLayer()
 {
-
 }
 
 bool GameLayer::init()
@@ -20,7 +25,14 @@ bool GameLayer::init()
 	{
 		CC_BREAK_IF(!CCLayer::init());
 
-		CC_BREAK_IF(!loadResource());
+		CC_BREAK_IF(!this->loadResource());
+		CC_BREAK_IF(!this->loadDataLayer());
+
+		//增加单点触摸
+		auto touchListener = EventListenerTouchOneByOne::create();
+		touchListener->setSwallowTouches(true);
+		touchListener->onTouchBegan = CC_CALLBACK_2(GameLayer::onTouchBegan, this);
+		_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
 		bRet = true;
 	} while (0);
@@ -33,17 +45,35 @@ bool GameLayer::loadResource()
 	bool bRet = false;
 	do 
 	{
-		Size winSize = Director::getInstance()->getWinSize();
-		std::string girlName = getRandomGirlName();
-		auto *pSprite = Sprite::create(girlName.c_str());
-		if (pSprite == NULL) return false;
+		std::string girlName;
+		_randomIndex = this->getRandom(1, 3);
+		
+		//读取alive状态女孩
+		girlName = this->getGirlName(_randomIndex, "alive");
+		_girlSpriteAlive = Sprite::create(girlName.c_str());
+		if (_girlSpriteAlive == NULL) return false;	
+		_girlSpriteAlive->setPosition(Point(WINSIZE.width / 2, WINSIZE.height / 2));
+		_girlSpriteAlive->setVisible(true);
+		_girlSpriteAlive->setScale(2.0f);
+		this->addChild(_girlSpriteAlive);
 
-		pSprite->setPosition(Point(winSize.width / 2, winSize.height / 2));
-		this->addChild(pSprite);
+		//读取roll状态女孩
+		girlName = this->getGirlName(_randomIndex, "roll");
+		_girlSpriteRoll = Sprite::create(girlName.c_str());
+		if (_girlSpriteRoll == NULL) return false;
+		_girlSpriteRoll->setPosition(Point(WINSIZE.width / 2, WINSIZE.height / 2));
+		_girlSpriteRoll->setVisible(false);
+		_girlSpriteRoll->setScale(2.0f);
+		this->addChild(_girlSpriteRoll);
 
-		auto touchListener = EventListenerTouchOneByOne::create();
-		touchListener->onTouchBegan = CC_CALLBACK_2(GameLayer::onTouchBegan, this);
-		_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
+		//读取dead状态女孩
+		girlName = this->getGirlName(_randomIndex, "die");
+		_girlSpriteDead = Sprite::create(girlName.c_str());
+		if (_girlSpriteDead == NULL) return false;
+		_girlSpriteDead->setPosition(Point(WINSIZE.width / 2, WINSIZE.height / 2));
+		_girlSpriteDead->setVisible(false);
+		_girlSpriteDead->setScale(2.0f);
+		this->addChild(_girlSpriteDead);
 
 		bRet = true;
 	} while (0);
@@ -51,53 +81,103 @@ bool GameLayer::loadResource()
 	return bRet;
 }
 
+bool GameLayer::loadDataLayer()
+{
+	bool bRet = false;
+	
+	do
+	{
+		_dataLayer = DataLayer::createWithColor(Color4B(10,10,10,255), WINSIZE.width, WINSIZE.height / 10);
+		this->addChild(_dataLayer, 100);
+
+		bRet = true;
+	} while (0);
+	
+	return bRet;
+}
+
 bool GameLayer::onTouchBegan(Touch *touch, Event *unused_event)
 {
-	Size winSize = Director::getInstance()->getWinSize();
-
 	Point pt = touch->getLocationInView();
 
-	if (pt.x < winSize.width / 2)
+	if (_rr.getIsDead())		//如果女孩已经死亡
 	{
-		this->shotLogic();
+		if (pt.x < WINSIZE.width / 2)		//点击屏幕左边重新开始
+		{
+			this->restart();
+		}
+		else								//点击屏幕右边结束游戏
+		{
+			this->gameover();
+		}
 	}
-	else
+	else						//女孩活着
 	{
-		this->rollLogic();
+		if (pt.x < WINSIZE.width / 2)		//点击屏幕左边开枪
+		{
+			this->shotLogic();
+		}
+		else								//点击屏幕右边换子弹
+		{
+			this->rollLogic();
+		}
 	}
-	
+
 	return true;
 }
 
 void GameLayer::shotLogic()
 {
+	SimpleAudioEngine::getInstance()->playEffect(SHOT_EMPTY_MP3);
+	
 	_rr.shot();
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(SHOT_EMPTY_MP3);
-
 	if (_rr.getIsDead())
 	{
-
-	}
-	else
-	{
+		_girlSpriteAlive->setVisible(false);
+		_girlSpriteDead->setVisible(true);
 	}
 }
 
 void GameLayer::rollLogic()
 {
+	SimpleAudioEngine::getInstance()->playEffect(ROLL_MP3);
 	_rr.roll();
 }
 
-std::string GameLayer::getRandomGirlName()
+void GameLayer::restart()
 {
-	int randomIndex = getRandom(1, 3);
-	std::string girlName;
-	if (randomIndex != -1)
+	this->reset();
+
+	this->loadResource();
+}
+
+void GameLayer::gameover()
+{
+	this->reset();
+
+	auto scene = dynamic_cast<PennyScene*>(Director::getInstance()->getRunningScene());
+	if (scene != nullptr)
 	{
-		if (randomIndex < 10)
-			girlName = "girl/girl0" + Value(randomIndex).asString() + ".png";
+		scene->addStartLayer();
+		this->removeFromParentAndCleanup(true);
+	}
+}
+
+void GameLayer::reset()
+{
+	_rr.reset();
+	this->removeAllChildren();
+}
+
+std::string GameLayer::getGirlName(int index, const std::string& state)
+{
+	std::string girlName;
+	if (_randomIndex != -1)
+	{
+		if (_randomIndex < 10)
+			girlName = "girl/girl0" + Value(_randomIndex).asString() + "_" + state + ".png";
 		else
-			girlName = "girl/girl" + Value(randomIndex).asString() + ".png";
+			girlName = "girl/girl"  + Value(_randomIndex).asString() + "_" + state + ".png";
 		
 	}
 
